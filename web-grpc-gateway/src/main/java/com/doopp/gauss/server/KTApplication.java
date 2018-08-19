@@ -1,20 +1,27 @@
 package com.doopp.gauss.server;
 
-import com.doopp.gauss.server.module.ApplicationModule;
-import com.doopp.gauss.server.module.RedisModule;
-import com.doopp.gauss.server.netty.NettyServer;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.core.io.PathResource;
 
 public class KTApplication {
 
-    public static void main(String[] args) throws Exception {
-        System.setProperty("applicationPropertiesConfig", args[0]);
-        Injector injector = Guice.createInjector(
-                new RedisModule(),
-                new ApplicationModule()
-        );
-        final NettyServer server = injector.getInstance(NettyServer.class);
-        server.run();
+    public static void main(String[] args) {
+
+        if (args[0]!=null && (new PathResource(args[0])).exists()) {
+
+            // get run properties
+            System.setProperty("applicationPropertiesConfig", args[0]);
+
+            // init applicationContext
+            final AbstractApplicationContext ctx = new FileSystemXmlApplicationContext("classpath:config/spring-undertow.xml");
+
+            // add a shutdown hook for the above context...
+            ctx.registerShutdownHook();
+        }
+        // 缺少配置文件
+        else {
+            System.out.print("\n Run Example : java -jar application.war propertiesConfigPath\n");
+        }
     }
 }

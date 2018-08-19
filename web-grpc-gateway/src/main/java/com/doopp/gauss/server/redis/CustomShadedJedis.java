@@ -1,12 +1,19 @@
 package com.doopp.gauss.server.redis;
 
-import com.doopp.gauss.common.util.SerializeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import redis.clients.jedis.ShardedJedis;
 import redis.clients.jedis.ShardedJedisPool;
 
+
 public class CustomShadedJedis {
 
+    private final Logger logger = LoggerFactory.getLogger(CustomShadedJedis.class);
+
     private ShardedJedisPool shardedJedisPool;
+
+    private final JdkSerializationRedisSerializer redisSerializer = new JdkSerializationRedisSerializer();
 
     public void set(String key, String value) {
         ShardedJedis shardedJedis = shardedJedisPool.getResource();
@@ -31,7 +38,7 @@ public class CustomShadedJedis {
 
     public void set(byte[] key, Object object) {
         ShardedJedis shardedJedis = shardedJedisPool.getResource();
-        byte[] _object = SerializeUtils.serialize(object);
+        byte[] _object = redisSerializer.serialize(object);
         shardedJedis.set(key, _object);
         shardedJedis.close();
     }
@@ -42,7 +49,7 @@ public class CustomShadedJedis {
         if (_object==null) {
             return null;
         }
-        Object object = SerializeUtils.deSerialize(_object);
+        Object object = redisSerializer.deserialize(_object);
         shardedJedis.close();
         return object;
     }

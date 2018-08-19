@@ -1,95 +1,117 @@
 group 'com.doopp.gauss'
-version '1.0'
+version '1.5'
 
 apply plugin: 'java'
-apply plugin: 'com.google.protobuf'
+apply plugin: 'application'
 
-buildscript {
-    repositories {
-        maven {
-            // The google mirror is less flaky than mavenCentral()
-            url "https://maven-central.storage-download.googleapis.com/repos/central/data/"
-        }
-    }
-    dependencies {
-        // ASSUMES GRADLE 2.12 OR HIGHER. Use plugin version 0.7.5 with earlier
-        // gradle versions
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.3'
-    }
+sourceCompatibility = 1.8
+
+ext {
+    springVersion = '5.0.4.RELEASE'
+    undertowVersion = '1.4.20.Final'
 }
 
 repositories {
-    maven {
-        url "https://maven-central.storage-download.googleapis.com/repos/central/data/"
-    }
     mavenLocal()
-}
+    jcenter()
+    mavenCentral()
 
-def grpcVersion = '1.14.0'
+    maven { url 'http://repo.spring.io/libs-release' }
+    maven { url "http://repo.springsource.org/repo" }
+}
 
 dependencies {
 
-    // Guice  Netty
-    compile 'com.google.inject:guice:4.2.0'
-    compile 'com.google.guava:guava:24.0-jre'
-    compile "io.grpc:grpc-stub:${grpcVersion}"
-    compile "io.grpc:grpc-netty:${grpcVersion}"
-    compile "io.grpc:grpc-protobuf:${grpcVersion}"
+    // tomcat
+    // compile 'javax.servlet:javax.servlet-api:3.0.1'
 
-    // database
-    // compile 'mysql:mysql-connector-java:6.0.6'
-    // compile 'com.zaxxer:HikariCP:2.7.7'
-    // compile 'org.mybatis:mybatis:3.4.5'
-    // compile 'org.mybatis:mybatis-guice:3.10'
+    // spring core
+    compile "org.springframework:spring-core:$springVersion"
+    compile "org.springframework:spring-aop:$springVersion"
+    compile "org.springframework:spring-context:$springVersion"
+    compile "org.springframework:spring-context-support:$springVersion"
+    compile "org.springframework:spring-beans:$springVersion"
+    compile "org.springframework:spring-web:$springVersion"
+    compile "org.springframework:spring-webmvc:$springVersion"
+    compile "org.springframework:spring-expression:$springVersion"
+    compile "org.springframework:spring-tx:$springVersion"
+    compile "org.springframework:spring-jdbc:$springVersion"
+    // compile "org.springframework:spring-test:$springVersion"
+    // compile "org.springframework:spring-websocket:$springVersion"
+    // compile "org.springframework:spring-messaging:$springVersion"
 
-    // Redis
-    // compile 'redis.clients:jedis:2.9.0'
+    // spring security oauth2.0
+    // compile 'org.apache.oltu.oauth2:org.apache.oltu.oauth2.authzserver:1.0.2'
 
-    // template
-    // compile 'org.freemarker:freemarker:2.3.23'
+    // Ehcache
+    // compile 'net.sf.ehcache:ehcache-core:2.6.11'
 
     // JSON
-    // compile 'com.google.code.gson:gson:2.8.2'
+    compile 'com.alibaba:fastjson:1.2.31'
 
-    compileOnly 'org.projectlombok:lombok:1.16.18'
+    // database
+    compile 'mysql:mysql-connector-java:6.0.6'
+    compile 'com.zaxxer:HikariCP:2.7.7'
+    // compile 'com.alibaba:druid:1.1.4'
+    compile 'org.mybatis:mybatis:3.4.4'
+    compile 'org.mybatis:mybatis-spring:1.3.0'
+    // compile 'org.mybatis.caches:mybatis-ehcache:1.1.0'
 
-    // logger
+    // Redis
+    compile 'redis.clients:jedis:2.9.0'
+    compile 'org.springframework.data:spring-data-redis:1.8.6.RELEASE'
+
+    // async http client
+    // compile 'com.ning:async-http-client:1.9.38'
+
+    // file upload
+    // compile 'commons-fileupload:commons-fileupload:1.3.3'
+
+    // Logging
     compile 'org.slf4j:slf4j-api:1.7.25'
     compile 'org.slf4j:slf4j-log4j12:1.7.25'
+
+    // template
+    compile 'org.freemarker:freemarker:2.3.23'
+
+    // Util
+    compile 'org.mapstruct:mapstruct-jdk8:1.2.0.Final'
+    compileOnly 'org.mapstruct:mapstruct-processor:1.2.0.Final'
+    compileOnly 'org.projectlombok:lombok:1.16.18'
+
+    // undertow
+    compile "io.undertow:undertow-core:$undertowVersion"
+    compile "io.undertow:undertow-servlet:$undertowVersion"
+    compile "io.undertow:undertow-websockets-jsr:$undertowVersion"
+    // compile 'io.netty:netty-all:4.1.21.Final'
+
+    // public resources, ref. http://www.webjars.org/
+    // compile 'org.webjars:bootstrap:3.3.7'
+    // compile 'org.webjars.bower:angular:1.6.6'
+    // compile 'org.webjars.bower:angular-route:1.6.6'
+    // compile 'org.webjars.bower:angular-cookies:1.6.6'
+    // compile 'org.webjars:webjars-locator:+'
+
+    // testCompile group: 'junit', name: 'junit', version: '4.11'
+    // testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
-// gradle clean generateProto
-protobuf {
-    protoc {
-        artifact = 'com.google.protobuf:protoc:3.5.1-1'
-    }
-    plugins {
-        grpc {
-            artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}"
-        }
-    }
-    generateProtoTasks {
-        all()*.plugins {
-            grpc {}
-        }
-    }
-}
+//    apply plugin: 'idea'
+//    apply plugin: 'spring-boot'
+//    buildscript {
+//        repositories {
+//            mavenLocal()
+//            jcenter()
+//            mavenCentral()
+//
+//            maven { url "http://repo.spring.io/release" }
+//            maven { url "http://repo.spring.io/milestone" }
+//        }
+//        dependencies {
+//            classpath "org.springframework.boot:spring-boot-gradle-plugin:1.5.7.RELEASE"
+//        }
+//    }
 
-// Inform IDEs like IntelliJ IDEA, Eclipse or NetBeans about the generated code.
-sourceSets {
-    main {
-        java {
-            srcDirs 'build/generated/source/proto/main/grpc'
-            srcDirs 'build/generated/source/proto/main/java'
-        }
-    }
-}
-
-// Generate IntelliJ IDEA's .idea & .iml project files
-apply plugin: 'idea'
-
-// Provide convenience executables for trying out the examples.
-apply plugin: 'application'
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
@@ -98,9 +120,9 @@ tasks.withType(JavaCompile) {
 jar {
     manifest {
         attributes(
-            "Manifest-Version": 1.0,
-            "Main-Class": "com.doopp.gauss.server.KTApplication",
-            "Class-Path": "./"
+                "Manifest-Version": 1.0,
+                "Main-Class": "com.doopp.gauss.server.KTApplication",
+                "Class-Path": "./"
         )
     }
     from {
@@ -109,8 +131,14 @@ jar {
         }
     }
 }
-task clear(type:Delete){
+task clearPj(type:Delete){
     delete 'build','target'
 }
-task release(type:Copy,dependsOn: [clear, jar]) {
+task copyJar(type:Copy){
+    // from configurations.runtime
+    // into ('build/libs')
+}
+task release(type: Copy,dependsOn: [clearPj, copyJar, jar]) {
+    // from  'webapp/WEB-INF'
+    // into ('WEB-INF') // 目标位置
 }
