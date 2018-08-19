@@ -108,9 +108,9 @@ public class UndertowServer implements InitializingBean, DisposableBean {
         this.webAppRoot = properties.r("server.webAppRoot");
         this.host = properties.s("server.host");
         this.port = properties.i("server.port");
-        this.sslPort = properties.i("server.sslPort");
-        this.jksFile = properties.r("server.jks.file");
-        this.jksPassword = properties.s("server.jks.password");
-        this.jksSecret = properties.s("server.jks.secret");
+        //this.sslPort = properties.i("server.sslPort");
+        //this.jksFile = properties.r("server.jks.file");
+        //this.jksPassword = properties.s("server.jks.password");
+        //this.jksSecret = properties.s("server.jks.secret");
     }
 }

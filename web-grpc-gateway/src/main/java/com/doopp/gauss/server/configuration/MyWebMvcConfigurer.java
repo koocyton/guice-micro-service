@@ -27,14 +27,14 @@ public class MyWebMvcConfigurer implements WebMvcConfigurer {
     }
 
     // 上传文件
-    @Bean
-    public CommonsMultipartResolver multipartResolver() throws Exception {
-        CommonsMultipartResolver commonsMultipartResolver =  new CommonsMultipartResolver();
-        commonsMultipartResolver.setDefaultEncoding("UTF-8");
-        commonsMultipartResolver.setMaxUploadSize(5400000);
-        commonsMultipartResolver.setUploadTempDir(new FileSystemResource("D:\\tmp"));
-        return commonsMultipartResolver;
-    }
+    //    @Bean
+    //    public CommonsMultipartResolver multipartResolver() throws Exception {
+    //        CommonsMultipartResolver commonsMultipartResolver =  new CommonsMultipartResolver();
+    //        commonsMultipartResolver.setDefaultEncoding("UTF-8");
+    //        commonsMultipartResolver.setMaxUploadSize(5400000);
+    //        commonsMultipartResolver.setUploadTempDir(new FileSystemResource("D:\\tmp"));
+    //        return commonsMultipartResolver;
+    //    }
 
     // json by gson
     @Override

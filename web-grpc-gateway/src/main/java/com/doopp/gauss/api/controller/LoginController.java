@@ -12,29 +12,27 @@ import org.springframework.web.bind.annotation.*;
  * Created by henry on 2017/10/14.
  */
 @Controller
-@RequestMapping(value = "/api/v1/user")
+@RequestMapping(value = "/api")
 public class LoginController {
 
     @Autowired
     private LoginService loginService;
 
     @ResponseBody
-    @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public User profile(@RequestParam("user_id") Long userId) {
-        return new User();
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public User login(@RequestBody User user) {
+        return user;
     }
 
     @ResponseBody
-    @RequestMapping(value = "/register", method = RequestMethod.GET)
-    public User addFriend(@RequestAttribute("user_id") Long userId,
-                          @RequestAttribute("sessionUser") User sessionUser) {
-        return sessionUser;
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public User register(@RequestBody User user) {
+        return user;
     }
 
     @ResponseBody
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
-    public User addFriend(@RequestAttribute("user_id") Long userId,
-                          @RequestAttribute("sessionUser") User sessionUser) {
-        return sessionUser;
+    public User logout(@RequestBody User user) {
+        return user;
     }
 }
