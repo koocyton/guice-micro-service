@@ -1,20 +1,17 @@
 package com.doopp.gauss.server.netty;
 
-import com.doopp.gauss.api.grpc.AccountGrpcImpl;
-import com.doopp.gauss.api.service.impl.AccountServiceImpl;
 import com.doopp.gauss.server.application.ApplicationProperties;
 import com.google.inject.Injector;
-import io.grpc.Server;
-import io.grpc.ServerBuilder;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.*;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 import com.google.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.stream.ChunkedWriteHandler;
 
 public class NettyServer {
-
-	private final static Logger logger = LoggerFactory.getLogger(NettyServer.class);
 
 	@Inject
 	private ApplicationProperties applicationProperties;
@@ -22,50 +19,51 @@ public class NettyServer {
 	@Inject
 	private Injector injector;
 
-	private Server server;
+	@Inject
+	private EventLoopGroup bossGroup;
 
-	private void start() throws IOException {
-    /* The port on which the server should run */
+	@Inject
+	private EventLoopGroup workerGroup;
+
+	public void run() throws Exception {
+
+		String host = applicationProperties.s("server.host");
 		int port = applicationProperties.i("server.port");
-		server = ServerBuilder.forPort(port)
-				.addService(injector.getInstance(AccountGrpcImpl.class))
-				.build()
-				.start();
-		logger.info("Server started, listening on " + port);
-		Runtime.getRuntime().addShutdownHook(new Thread() {
+
+		try {
+			ServerBootstrap b = new ServerBootstrap();
+
+			b.group(bossGroup, workerGroup)
+				.channel(NioServerSocketChannel.class)
+				.childHandler(channelInitializer())
+				.option(ChannelOption.SO_BACKLOG, 128)
+				.childOption(ChannelOption.SO_KEEPALIVE, true);
+
+			System.out.print(">>> Running ServerBootstrap on " + host +":" + port + "\n");
+
+			ChannelFuture f = b.bind(host, port).sync();
+			f.channel().closeFuture().sync();
+		}
+		finally {
+			workerGroup.shutdownGracefully();
+			bossGroup.shutdownGracefully();
+		}
+	}
+
+	// http://blog.csdn.net/kkkloveyou/article/details/44656325
+	// http://blog.csdn.net/joeyon1985/article/details/53586004
+	private ChannelInitializer channelInitializer() {
+		return new ChannelInitializer<SocketChannel>() {
 			@Override
-			public void run() {
-				// Use stderr here since the logger may have been reset by its JVM shutdown hook.
-				logger.warn("*** shutting down gRPC server since JVM is shutting down");
-				NettyServer.this.stop();
-				logger.warn("*** server shut down");
+			protected void initChannel(SocketChannel ch) throws Exception {
+				// HttpServerCodec：将请求和应答消息解码为HTTP消息
+				ch.pipeline().addLast(new HttpServerCodec());
+				// HttpObjectAggregator：将HTTP消息的多个部分合成一条完整的HTTP消息
+				ch.pipeline().addLast(new HttpObjectAggregator(65536));
+				ch.pipeline().addLast(new ChunkedWriteHandler());
+				// my application
+				ch.pipeline().addLast(new ApplicationHandler(injector, "/game-socket"));
 			}
-		});
-	}
-
-	private void stop() {
-		if (server != null) {
-			server.shutdown();
-		}
-	}
-
-	/**
-	 * Await termination on the main thread since the grpc library uses daemon threads.
-	 */
-	private void blockUntilShutdown() throws InterruptedException {
-		if (server != null) {
-			server.awaitTermination();
-		}
-	}
-
-	/**
-	 * Main launches the server from the command line.
-	 */
-	public void run() throws IOException, InterruptedException {
-		this.start();
-		this.blockUntilShutdown();
+		};
 	}
 }
-
-
-
