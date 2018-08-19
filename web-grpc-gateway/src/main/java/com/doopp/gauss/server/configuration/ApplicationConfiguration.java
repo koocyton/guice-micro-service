@@ -7,9 +7,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 // @EnableCaching
 
 @Import({
-        CommonConfiguration.class,
-        MyBatisConfiguration.class,
-        RedisConfiguration.class
+
 })
 
 @ComponentScan(basePackages = {"com.doopp.gauss"}, excludeFilters = {

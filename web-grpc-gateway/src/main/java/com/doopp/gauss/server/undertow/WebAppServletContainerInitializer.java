@@ -34,13 +34,6 @@ public class WebAppServletContainerInitializer implements ServletContainerInitia
         dispatcher.setLoadOnStartup(1);
         dispatcher.addMapping("/");
 
-        // OAuth filter
-        // FilterRegistration.Dynamic shiroFilter = ctx.addFilter("shiroFilter", new DelegatingFilterProxy("shiroFilter", webApplicationContext));
-        // FilterRegistration.Dynamic shiroFilter = ctx.addFilter("shiroFilter", DelegatingFilterProxy.class);
-        // shiroFilter.setAsyncSupported(true);
-        // shiroFilter.setInitParameter("targetFilterLifecycle", "true");
-        // shiroFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), false, "/*");
-
         // 添加 druid sql 监控
         // ServletRegistration.Dynamic druidDispatcher = ctx.addServlet("DruidStatView", com.alibaba.druid.support.http.StatViewServlet.class);
         // druidDispatcher.setInitParameter("resetEnable", "false");

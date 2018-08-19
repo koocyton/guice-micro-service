@@ -1,18 +1,13 @@
 package com.doopp.gauss.common.entity;
 
 import lombok.Data;
-
 import java.io.Serializable;
 
-/**
- * user entity
- */
-
 @Data
-public class User implements Serializable{
+public class User implements Serializable {
 
     // 编号
-    private Long id;
+    private Long user_id;
 
     // 昵称
     private String nickname;
@@ -37,4 +32,7 @@ public class User implements Serializable{
 
     // 金币
     private int gold;
+
+    // 创建时间
+    private String created_at;
 }

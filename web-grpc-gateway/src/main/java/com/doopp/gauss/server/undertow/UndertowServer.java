@@ -2,6 +2,8 @@ package com.doopp.gauss.server.undertow;
 
 import com.doopp.gauss.server.configuration.ApplicationProperties;
 import io.undertow.Undertow;
+import io.undertow.UndertowOptions;
+import io.undertow.protocols.http2.Http2Channel;
 import io.undertow.server.HttpHandler;
 
 import io.undertow.server.handlers.resource.FileResourceManager;
@@ -13,11 +15,9 @@ import io.undertow.servlet.api.ServletContainerInitializerInfo;
 import io.undertow.servlet.util.ImmediateInstanceFactory;
 
 import static io.undertow.Handlers.path;
-import static io.undertow.Handlers.websocket;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
 
 import javax.net.ssl.*;
@@ -56,20 +56,26 @@ public class UndertowServer implements InitializingBean, DisposableBean {
         manager = Servlets.defaultContainer().addDeployment(deploymentInfo);
         manager.deploy();
         HttpHandler httpHandler = path()
-                .addPrefixPath("/", manager.start())
-                .addPrefixPath("/game-socket", websocket(new GameSocketConnectionCallback()));
+                .addPrefixPath("/", manager.start());
+                // .addPrefixPath("/game-socket", websocket(new GameSocketConnectionCallback()));
 
-        SSLContext sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(getKeyManagers(), null, null);
+        Undertow.Builder builder = Undertow.builder();
 
-        server = Undertow.builder()
-                .addHttpListener(port, host)
-                .addHttpsListener(sslPort, host, sslContext)
-                .setHandler(httpHandler)
-                .build();
+        if (this.jksFile!=null) {
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(getKeyManagers(), null, null);
+            builder.addHttpsListener(sslPort, host, sslContext);
+        }
+
+        server = builder.addHttpListener(port, host).setHandler(httpHandler).build();
         server.start();
 
-        System.out.print("\n >>> Undertow web server started at http://" + host + ":" + port + " and https://" + host + ":" + sslPort + "\n\n");
+        if (this.jksFile!=null) {
+            System.out.print("\n >>> Undertow web server started at http://" + host + ":" + port + " and https://" + host + ":" + sslPort + "\n\n");
+        }
+        else {
+            System.out.print("\n >>> Undertow web server started at http://" + host + ":" + port);
+        }
     }
 
     @Override
