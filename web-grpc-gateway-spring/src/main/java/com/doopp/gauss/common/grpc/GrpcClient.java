@@ -6,13 +6,13 @@ import io.grpc.StatusRuntimeException;
 import io.grpc.examples.helloworld.GreeterGrpc;
 import io.grpc.examples.helloworld.HelloReply;
 import io.grpc.examples.helloworld.HelloRequest;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Component
+@Service("crpcClient")
 public class GrpcClient {
 
     private static final Logger logger = Logger.getLogger(GrpcClient.class.getName());
