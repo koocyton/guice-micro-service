@@ -3,9 +3,6 @@ package com.doopp.gauss.server.configuration;
 import org.springframework.context.annotation.*;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-@Configuration
-// @EnableCaching
-
 @Import({
 
 })
@@ -14,6 +11,8 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
         @ComponentScan.Filter(type = FilterType.ANNOTATION, value = EnableWebMvc.class)
 })
 
+@Configuration
+// @EnableCaching
 public class ApplicationConfiguration {
 
 }

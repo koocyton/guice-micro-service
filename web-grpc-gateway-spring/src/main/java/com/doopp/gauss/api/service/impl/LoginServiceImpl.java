@@ -2,15 +2,25 @@ package com.doopp.gauss.api.service.impl;
 
 import com.doopp.gauss.api.service.LoginService;
 import com.doopp.gauss.common.entity.User;
+<<<<<<< HEAD
 import io.grpc.internal.GrpcUtil;
 import org.springframework.stereotype.Service;
 
 @Service("loginService")
+=======
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service("accountService")
+>>>>>>> 6301f248bbaa0bd25f5a630f6a2e81da184b6871
 public class LoginServiceImpl implements LoginService {
+
+    @Autowired
+    private GrpcClient grpcClient;
 
     @Override
     public User tokenUser(String sessionToken) {
-        return null;
+        return new User();
     }
 
     @Override
