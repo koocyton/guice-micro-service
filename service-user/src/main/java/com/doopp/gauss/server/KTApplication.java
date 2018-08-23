@@ -12,6 +12,7 @@ import com.google.inject.*;
 import com.google.inject.name.Names;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.gauss.user.UserByTokenGrpc;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.mybatis.guice.MyBatisModule;
 import org.mybatis.guice.datasource.helper.JdbcHelper;
