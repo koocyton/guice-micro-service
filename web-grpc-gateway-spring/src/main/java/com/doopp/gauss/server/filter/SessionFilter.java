@@ -27,7 +27,7 @@ public class SessionFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         // get bean
-        LoginService accountService = (LoginService) ApplicationContextUtil.getBean("accountService");
+        LoginService loginService = (LoginService) ApplicationContextUtil.getBean("loginService");
 
         // 不过滤的uri
         String[] notFilters = new String[]{
@@ -68,7 +68,7 @@ public class SessionFilter extends OncePerRequestFilter {
                 }
 
                 // get user
-                User user = accountService.tokenUser(sessionToken);
+                User user = loginService.tokenUser(sessionToken);
                 if (user == null) {
                     writeErrorResponse(404, response, "not found user");
                     return;

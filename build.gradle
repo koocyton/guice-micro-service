@@ -32,9 +32,6 @@ sourceSets {
             srcDir 'grpc-proto'
             include '**/*.proto'
         }
-        java {
-            srcDir '$projectDir/$serviceProject/build/generated'
-        }
     }
 }
 
@@ -53,5 +50,5 @@ protobuf {
             grpc {}
         }
     }
-    generatedFilesBaseDir = "$projectDir/$serviceProject/build/generated"
+    generatedFilesBaseDir = "$projectDir/grpc-proto/build/generated/source/proto"
 }

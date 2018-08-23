@@ -19,15 +19,15 @@ public class LoginController {
     private LoginService loginService;
 
     @ResponseBody
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public User login(@RequestBody User user) {
-        return user;
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    public User login() {//@RequestBody User user) {
+        return loginService.login("abcdefg", "");
     }
 
     @ResponseBody
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public User register(@RequestBody User user) {
-        return user;
+    @RequestMapping(value = "/register", method = RequestMethod.GET)
+    public User register() {//(@RequestBody User user) {
+        return new User();
     }
 
     @ResponseBody

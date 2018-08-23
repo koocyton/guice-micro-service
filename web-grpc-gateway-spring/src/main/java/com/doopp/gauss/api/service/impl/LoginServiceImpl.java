@@ -15,13 +15,17 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public User tokenUser(String sessionToken) {
-        grpcClient.greet("abc");
+        // grpcClient.greet("koocyton@gmail.com");
         return new User();
     }
 
     @Override
     public User login(String account, String password) {
-        return null;
+        // grpcClient.greet("koocyton@gmail.com");
+        User user = new User();
+        user.setUser_id(1234L);
+        user.setNickname(grpcClient.greet("koocyton@gmail.com"));
+        return user;
     }
 
     @Override

@@ -13,20 +13,6 @@ ext {
     grpcVersion = '1.14.0'
 }
 
-buildscript {
-    repositories {
-        maven {
-            // The google mirror is less flaky than mavenCentral()
-            url "https://maven-central.storage-download.googleapis.com/repos/central/data/"
-        }
-    }
-    dependencies {
-        // ASSUMES GRADLE 2.12 OR HIGHER. Use plugin version 0.7.5 with earlier
-        // gradle versions
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.3'
-    }
-}
-
 repositories {
     mavenLocal()
     jcenter()
@@ -35,7 +21,6 @@ repositories {
     maven { url 'http://repo.spring.io/libs-release' }
     maven { url "http://repo.springsource.org/repo" }
     maven { url "https://maven-central.storage-download.googleapis.com/repos/central/data/" }
-    mavenLocal()
 }
 
 dependencies {
@@ -102,6 +87,16 @@ dependencies {
     // testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
+// Inform IDEs like IntelliJ IDEA, Eclipse or NetBeans about the generated code.
+sourceSets {
+    main {
+        java {
+            srcDirs '../grpc-proto/build/generated/source/proto/main/grpc'
+            srcDirs '../grpc-proto/build/generated/source/proto/main/java'
+        }
+    }
+}
+
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
@@ -120,8 +115,10 @@ jar {
         }
     }
 }
+
 task clear(type: Delete) {
     delete 'build', 'target'
 }
+
 task release(type: Copy, dependsOn: [clear, jar]) {
 }

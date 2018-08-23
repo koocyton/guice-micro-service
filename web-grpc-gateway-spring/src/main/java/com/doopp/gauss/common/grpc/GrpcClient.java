@@ -9,10 +9,9 @@ import io.grpc.examples.helloworld.HelloRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Service("crpcClient")
+@Service("grpcClient")
 public class GrpcClient {
 
     private static final Logger logger = Logger.getLogger(GrpcClient.class.getName());
@@ -22,7 +21,7 @@ public class GrpcClient {
     private final GreeterGrpc.GreeterBlockingStub blockingStub;
 
     public GrpcClient() {
-        this("127.0.0.1", 8085);
+        this("127.0.0.1", 8081);
     }
 
     /** Construct client connecting to HelloWorld server at {@code host:port}. */
@@ -45,34 +44,17 @@ public class GrpcClient {
     }
 
     /** Say hello to server. */
-    public void greet(String name) {
-        logger.info("Will try to greet " + name + " ...");
+    public String greet(String name) {
+        // logger.info("Will try to greet " + name + " ...");
         HelloRequest request = HelloRequest.newBuilder().setName(name).build();
         HelloReply response;
         try {
             response = blockingStub.sayHello(request);
         } catch (StatusRuntimeException e) {
-            logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
-            return;
+            // logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
+            return null;
         }
-        logger.info("Greeting: " + response.getMessage());
+        return response.getMessage();
+        // logger.info("Greeting: " + response.getMessage());
     }
-
-    /**
-     * Greet server. If provided, the first element of {@code args} is the name to use in the
-     * greeting.
-     */
-    //    public static void main(String[] args) throws Exception {
-    //        GrpcClient client = new GrpcClient("localhost", 8081);
-    //        try {
-    //      /* Access a service running on the local machine on port 50051 */
-    //            String user = "koocyton@gmail.com";
-    //            if (args.length > 0) {
-    //                user = args[0]; /* Use the arg as the name to greet if provided */
-    //            }
-    //            client.greet(user);
-    //        } finally {
-    //            client.shutdown();
-    //        }
-    //    }
 }
