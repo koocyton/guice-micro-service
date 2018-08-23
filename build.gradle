@@ -1,0 +1,57 @@
+group 'com.doopp.gauss'
+version '1.5'
+
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'com.google.protobuf'
+
+buildscript {
+    repositories {
+        maven {
+            // The google mirror is less flaky than mavenCentral()
+            url "https://maven-central.storage-download.googleapis.com/repos/central/data/"
+        }
+    }
+    dependencies {
+        // ASSUMES GRADLE 2.12 OR HIGHER. Use plugin version 0.7.5 with earlier
+        // gradle versions
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.3'
+    }
+}
+
+repositories {
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+    maven { url "https://maven-central.storage-download.googleapis.com/repos/central/data/" }
+}
+
+sourceSets {
+    main {
+        proto {
+            srcDir 'grpc-proto'
+            include '**/*.proto'
+        }
+        java {
+            srcDir '$projectDir/$serviceProject/build/generated'
+        }
+    }
+}
+
+// gradle clean generateProto
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.5.1-1'
+    }
+    plugins {
+        grpc {
+            artifact = "io.grpc:protoc-gen-grpc-java:1.14.0"
+        }
+    }
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {}
+        }
+    }
+    generatedFilesBaseDir = "$projectDir/$serviceProject/build/generated"
+}
