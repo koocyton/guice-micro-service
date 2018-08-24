@@ -1,6 +1,5 @@
 package com.doopp.gauss.api.service.impl;
 
-
 import com.doopp.gauss.api.service.AccountService;
 import com.doopp.gauss.common.dao.UserDao;
 import com.doopp.gauss.common.entity.User;

@@ -1,6 +1,6 @@
 package com.doopp.gauss.server;
 
-import com.doopp.gauss.api.grpc.AccountGrpcImpl;
+import com.doopp.gauss.api.grpc.UserGrpcImpl;
 import com.doopp.gauss.api.service.AccountService;
 import com.doopp.gauss.api.service.impl.AccountServiceImpl;
 import com.doopp.gauss.common.dao.UserDao;
@@ -12,7 +12,6 @@ import com.google.inject.*;
 import com.google.inject.name.Names;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
-import io.grpc.gauss.user.UserByTokenGrpc;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.mybatis.guice.MyBatisModule;
 import org.mybatis.guice.datasource.helper.JdbcHelper;
@@ -96,7 +95,7 @@ public class KTApplication {
             int port = this.applicationProperties.i("server.port");
 
             this.server = ServerBuilder.forPort(port)
-                .addService(injector.getInstance(AccountGrpcImpl.class))
+                .addService(injector.getInstance(UserGrpcImpl.class))
                 .build()
                 .start();
 
