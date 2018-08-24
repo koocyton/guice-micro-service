@@ -52,3 +52,7 @@ protobuf {
     }
     generatedFilesBaseDir = "$projectDir/grpc-proto/build/generated/source/proto"
 }
+
+task clear(type: Delete) {
+    delete 'grpc-proto/build'
+}
