@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+// option java_multiple_files = true;
+option java_package = "io.grpc.gauss.errmsg";
+option java_outer_classname = "ErrmsgProto";
+
+package errmsg;
+
+message ErrMsg {
+  int32 code = 1;
+  string message = 2;
+}

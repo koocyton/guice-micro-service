@@ -3,7 +3,7 @@ version '1.5'
 
 apply plugin: 'java'
 apply plugin: 'application'
-apply plugin: 'com.google.protobuf'
+// apply plugin: 'com.google.protobuf'
 
 sourceCompatibility = 1.8
 
@@ -20,7 +20,7 @@ repositories {
 
     maven { url 'http://repo.spring.io/libs-release' }
     maven { url "http://repo.springsource.org/repo" }
-    maven { url "https://maven-central.storage-download.googleapis.com/repos/central/data/" }
+    // maven { url "https://maven-central.storage-download.googleapis.com/repos/central/data/" }
 }
 
 dependencies {

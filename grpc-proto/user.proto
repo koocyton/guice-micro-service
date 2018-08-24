@@ -1,5 +1,9 @@
 syntax = "proto3";
 
+import "ping.proto";
+import "errmsg.proto";
+import "model.proto";
+
 option java_multiple_files = true;
 option java_package = "io.grpc.gauss.user";
 option java_outer_classname = "UserProto";
@@ -7,15 +11,127 @@ option objc_class_prefix = "UP";
 
 package user;
 
-// get user by token
-service UserByToken {
-  rpc UserByToken (UserByTokenRequest) returns (UserByTokenReply) {}
+message LoginReq {
+  string x_auth_mode = 1;
+  string x_auth_token = 2;
+  string x_auth_email = 3;
+  string x_auth_password = 4;
+  string language = 5;
+  string device_id = 6;
+  string client_ip = 7;
 }
-message UserByTokenRequest {
-  string token = 1;
+
+message LoginResp {
+  errmsg.ErrMsg err = 1;
+  int64 user_id = 2;
+  bool is_new_user = 3;
+  string auth_token = 4;
+  string auth_token_secret = 5;
+  bool has_init = 6;
+  model.User user = 7;
 }
-message UserByTokenReply {
-  int64 id = 1;
-  string account = 2;
-  string password = 3;
+
+message RegisterReq {
+  string x_auth_email = 1;
+  string x_auth_password = 2;
+  string language = 3;
+  string device_id = 4;
+  string client_ip = 5;
+}
+
+message RegisterResp {
+  errmsg.ErrMsg err = 1;
+  int64 user_id =2;
+  bool is_new_user = 3;
+  string auth_token = 4;
+  string auth_token_secret = 5;
+  model.User user = 6;
+}
+
+message UploadAvatarReq {
+  int64 user_id = 1;
+  bytes data = 2;
+}
+
+message UploadAvatarResp {
+  errmsg.ErrMsg err = 1;
+  string avatar_url = 2;
+}
+
+//获取用户Auth信息
+message UserAuthReq {
+  int64 user_id = 1;
+}
+
+message UserAuthResp {
+  errmsg.ErrMsg err = 1;
+  model.UserAuth auth = 2;
+}
+
+//获取用户简要信息
+message UserItemReq {
+  int64 user_id = 1;
+}
+
+message UserItemResp {
+  errmsg.ErrMsg err = 1;
+  model.UserItem user = 2;
+}
+
+//批量获取用户简要信息
+message UserItemsByIdsReq {
+  repeated int64 ids = 1;
+}
+
+message UserItemsByIdsResp {
+  errmsg.ErrMsg err = 1;
+  repeated model.UserItem items = 2;
+}
+
+//获取用户详细信息
+message UserInfoReq {
+  int64 user_id = 1;
+  int64 my_user_id = 2;
+}
+
+message UserInfoResp {
+  errmsg.ErrMsg err = 1;
+  model.UserItem user = 2;
+}
+
+//初始化个人基本信息
+message ProfileInitReq {
+  int64 user_id = 1;
+  int32 gender = 2;
+  int32 birthday = 3;
+  string name = 4;
+}
+
+message ProfileInitResp {
+  errmsg.ErrMsg err = 1;
+}
+
+// 修改个人基本信息
+message ProfileEditReq {
+  int64 user_id = 1;
+  int32 birthday = 2;
+  string name = 3;
+  string location = 4;
+  bool set_location = 5;
+  string signature = 6;
+  repeated int32 chat_object_ids = 7;
+  repeated int32 attribute_ids = 8;
+  repeated string image_ids = 9;
+}
+
+service User {
+  rpc Ping (ping.Empty) returns (ping.Empty) {}
+  rpc Login (LoginReq) returns (LoginResp) {}
+  rpc Register (RegisterReq) returns (RegisterResp) {}
+  rpc UploadAvatar (UploadAvatarReq) returns (UploadAvatarResp) {}
+  rpc UserAuth (UserAuthReq) returns (UserAuthResp) {}
+  rpc UserItem (UserItemReq) returns (UserItemResp) {}
+  rpc UserItemsByIds (UserItemsByIdsReq) returns (UserItemsByIdsResp) {}
+  rpc UserInfo (UserInfoReq) returns (UserInfoResp) {}
+  rpc ProfileInit (ProfileInitReq) returns (ProfileInitResp) {}
 }

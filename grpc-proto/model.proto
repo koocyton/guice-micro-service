@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+// option java_multiple_files = true;
+option java_package = "io.grpc.gauss.model";
+option java_outer_classname = "ModelProto";
+
+package model;
+
+// 性别
+enum GenderType {
+  Unknown = 0;
+  Male = 1;
+  Famale = 2;
+}
+
+// 用户Auth
+message UserAuth {
+  int64 user_id = 1;
+  string oauth_token = 2;
+  string oauth_token_secret = 3;
+}
+
+// 用户核心信息
+message User {
+  int64 user_id = 1;
+  string name = 2;
+  string avatar = 3;
+}
+
+// 用户简要信息
+message UserItem {
+  int64 user_id = 1;
+  string name = 3;
+  string avatar = 4;
+  GenderType gender = 7;
+  int32 age = 8;
+  string distance = 9;
+  string signature = 10;
+  string constellation = 11;
+  int32 online = 12;
+}
