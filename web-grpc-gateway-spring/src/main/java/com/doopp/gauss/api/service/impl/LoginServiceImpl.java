@@ -3,15 +3,21 @@ package com.doopp.gauss.api.service.impl;
 import com.doopp.gauss.api.service.LoginService;
 import com.doopp.gauss.common.entity.User;
 
-import com.doopp.gauss.common.grpc.GrpcClient;
+import com.doopp.gauss.common.grpc.UserGrpcClient;
+import io.grpc.gauss.user.LoginReply;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service("loginService")
 public class LoginServiceImpl implements LoginService {
 
+
+    private final Logger logger = LoggerFactory.getLogger(UserGrpcClient.class);
+
     @Autowired
-    private GrpcClient grpcClient;
+    private UserGrpcClient userGrpcClient;
 
     @Override
     public User tokenUser(String sessionToken) {
@@ -21,11 +27,14 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public User login(String account, String password) {
-        // grpcClient.greet("koocyton@gmail.com");
+        LoginReply reply = userGrpcClient.login("koocyton@gmail.com");
         User user = new User();
         user.setUser_id(1234L);
-        user.setNickname(grpcClient.greet("koocyton@gmail.com"));
+        user.setNickname(reply.getAuthToken());
+        logger.info("" + reply);
+        logger.info("" + user);
         return user;
+        // return user;
     }
 
     @Override

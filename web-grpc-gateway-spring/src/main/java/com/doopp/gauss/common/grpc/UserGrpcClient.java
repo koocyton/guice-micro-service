@@ -1,31 +1,33 @@
 package com.doopp.gauss.common.grpc;
 
+import com.doopp.gauss.server.filter.SessionFilter;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
-import io.grpc.examples.helloworld.GreeterGrpc;
-import io.grpc.examples.helloworld.HelloReply;
-import io.grpc.examples.helloworld.HelloRequest;
+import io.grpc.gauss.user.LoginReply;
+import io.grpc.gauss.user.LoginRequest;
+import io.grpc.gauss.user.UserGrpc;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
 
-@Service("grpcClient")
-public class GrpcClient {
+@Service("userGrpcClient")
+public class UserGrpcClient {
 
-    private static final Logger logger = Logger.getLogger(GrpcClient.class.getName());
+    private final Logger logger = LoggerFactory.getLogger(UserGrpcClient.class);
 
     private final ManagedChannel channel;
 
-    private final GreeterGrpc.GreeterBlockingStub blockingStub;
+    private final UserGrpc.UserBlockingStub blockingStub;
 
-    public GrpcClient() {
-        this("127.0.0.1", 8081);
+    public UserGrpcClient() {
+        this("127.0.0.1", 8091);
     }
 
     /** Construct client connecting to HelloWorld server at {@code host:port}. */
-    public GrpcClient(String host, int port) {
+    private UserGrpcClient(String host, int port) {
         this(ManagedChannelBuilder.forAddress(host, port)
             // Channels are secure by default (via SSL/TLS). For the example we disable TLS to avoid
             // needing certificates.
@@ -34,9 +36,9 @@ public class GrpcClient {
     }
 
     /** Construct client for accessing RouteGuide server using the existing channel. */
-    GrpcClient(ManagedChannel channel) {
+    private UserGrpcClient(ManagedChannel channel) {
         this.channel = channel;
-        blockingStub = GreeterGrpc.newBlockingStub(channel);
+        blockingStub = UserGrpc.newBlockingStub(channel);
     }
 
     public void shutdown() throws InterruptedException {
@@ -44,17 +46,18 @@ public class GrpcClient {
     }
 
     /** Say hello to server. */
-    public String greet(String name) {
+    public LoginReply login(String name) {
         // logger.info("Will try to greet " + name + " ...");
-        HelloRequest request = HelloRequest.newBuilder().setName(name).build();
-        HelloReply response;
+        LoginRequest request = LoginRequest.newBuilder().setClientIp(name).build();
+        LoginReply reply;
         try {
-            response = blockingStub.sayHello(request);
-        } catch (StatusRuntimeException e) {
+            return blockingStub.login(request);
+        }
+        catch (StatusRuntimeException e) {
             // logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
             return null;
         }
-        return response.getMessage();
+        // return reply.getMessage();
         // logger.info("Greeting: " + response.getMessage());
     }
 }
