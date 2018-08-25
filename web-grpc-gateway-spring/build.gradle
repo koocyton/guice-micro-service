@@ -94,6 +94,9 @@ sourceSets {
             srcDirs '../grpc-proto/build/generated/source/proto/main/grpc'
             srcDirs '../grpc-proto/build/generated/source/proto/main/java'
         }
+        resources {
+            srcDirs '../grpc-proto'
+        }
     }
 }
 

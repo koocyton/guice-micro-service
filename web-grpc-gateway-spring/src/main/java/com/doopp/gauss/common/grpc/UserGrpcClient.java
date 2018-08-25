@@ -1,6 +1,5 @@
 package com.doopp.gauss.common.grpc;
 
-import com.doopp.gauss.server.filter.SessionFilter;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
@@ -46,7 +45,7 @@ public class UserGrpcClient {
     }
 
     /** Say hello to server. */
-    public LoginReply login(String name) {
+    public LoginReply login(String name, String password) {
         // logger.info("Will try to greet " + name + " ...");
         LoginRequest request = LoginRequest.newBuilder().setClientIp(name).build();
         LoginReply reply;

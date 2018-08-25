@@ -4,6 +4,7 @@ import com.doopp.gauss.api.service.LoginService;
 import com.doopp.gauss.common.entity.User;
 
 import com.doopp.gauss.common.grpc.UserGrpcClient;
+import com.google.gson.Gson;
 import io.grpc.gauss.user.LoginReply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ public class LoginServiceImpl implements LoginService {
         User user = new User();
         user.setUser_id(1234L);
         user.setNickname(reply.getAuthToken());
+        logger.info("" + (new Gson()).toJson(reply));
         logger.info("" + reply);
         logger.info("" + user);
         return user;
