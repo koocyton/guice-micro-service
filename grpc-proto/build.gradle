@@ -29,13 +29,13 @@ repositories {
 sourceSets {
     main {
         proto {
-            srcDir 'grpc-proto'
-            include '**/*.proto'
+            srcDir './'
+            include '*.proto'
         }
     }
 }
 
-// gradle clean generateProto
+// gradle clear clean generateProto
 protobuf {
     protoc {
         artifact = 'com.google.protobuf:protoc:3.5.1-1'
@@ -50,9 +50,9 @@ protobuf {
             grpc {}
         }
     }
-    generatedFilesBaseDir = "$projectDir/grpc-proto/build/generated/source/proto"
+    generatedFilesBaseDir = "$projectDir/build/generated/source/proto"
 }
 
 task clear(type: Delete) {
-    delete 'grpc-proto/build'
+    delete 'build'
 }
