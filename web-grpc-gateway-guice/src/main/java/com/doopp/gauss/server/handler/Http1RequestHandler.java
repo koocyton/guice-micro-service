@@ -1,6 +1,8 @@
 package com.doopp.gauss.server.handler;
 
 import com.doopp.gauss.server.dispatcher.RequestDispatcher;
+import com.doopp.gauss.server.filter.SessionFilter;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
@@ -9,11 +11,8 @@ import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
 
 public class Http1RequestHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
+    @Inject
     private Injector injector;
-
-    Http1RequestHandler(Injector injector) {
-        this.injector = injector;
-    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest httpRequest) throws Exception {
@@ -26,7 +25,14 @@ public class Http1RequestHandler extends SimpleChannelInboundHandler<FullHttpReq
         FullHttpResponse httpResponse = new DefaultFullHttpResponse(httpRequest.protocolVersion(), HttpResponseStatus.OK);
         // httpResponse.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/html; charset=UTF-8");
 
-        injector.getInstance(RequestDispatcher.class).processor(ctx, httpRequest, httpResponse);
+        // Filter
+        SessionFilter sessionFilter = injector.getInstance(SessionFilter.class);
+
+        // Dispatch
+        if (sessionFilter.doFilter()) {
+            injector.getInstance(RequestDispatcher.class).processor(ctx, httpRequest, httpResponse);
+        }
+
         httpResponse.headers().set(CONTENT_LENGTH, httpResponse.content().readableBytes());
 
         if (HttpUtil.isKeepAlive(httpRequest)) {

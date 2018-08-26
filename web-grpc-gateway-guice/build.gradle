@@ -1,40 +1,36 @@
 group 'com.doopp.gauss'
-version '1.0'
+version '1.5'
 
 apply plugin: 'java'
-apply plugin: 'com.google.protobuf'
+apply plugin: 'application'
+// apply plugin: 'com.google.protobuf'
 
-buildscript {
-    repositories {
-        maven {
-            // The google mirror is less flaky than mavenCentral()
-            url "https://maven-central.storage-download.googleapis.com/repos/central/data/"
-        }
-    }
-    dependencies {
-        // ASSUMES GRADLE 2.12 OR HIGHER. Use plugin version 0.7.5 with earlier
-        // gradle versions
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.3'
-    }
+sourceCompatibility = 1.8
+
+ext {
+    grpcVersion = '1.14.0'
 }
 
 repositories {
-    maven {
-        url "https://maven-central.storage-download.googleapis.com/repos/central/data/"
-    }
     mavenLocal()
+    jcenter()
+    mavenCentral()
+
+    maven { url 'http://repo.spring.io/libs-release' }
+    maven { url "http://repo.springsource.org/repo" }
+    // maven { url "https://maven-central.storage-download.googleapis.com/repos/central/data/" }
 }
 
-def grpcVersion = '1.14.0'
 
 dependencies {
 
     // Guice  Netty
     compile 'com.google.inject:guice:4.2.0'
     compile 'com.google.guava:guava:24.0-jre'
-    compile "io.grpc:grpc-stub:${grpcVersion}"
-    compile "io.grpc:grpc-netty:${grpcVersion}"
-    compile "io.grpc:grpc-protobuf:${grpcVersion}"
+    // Grpc
+    compile "io.grpc:grpc-stub:$grpcVersion"
+    compile "io.grpc:grpc-netty:$grpcVersion"
+    compile "io.grpc:grpc-protobuf:$grpcVersion"
 
     // database
     // compile 'mysql:mysql-connector-java:6.0.6'
@@ -58,38 +54,18 @@ dependencies {
     compile 'org.slf4j:slf4j-log4j12:1.7.25'
 }
 
-// gradle clean generateProto
-protobuf {
-    protoc {
-        artifact = 'com.google.protobuf:protoc:3.5.1-1'
-    }
-    plugins {
-        grpc {
-            artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}"
-        }
-    }
-    generateProtoTasks {
-        all()*.plugins {
-            grpc {}
-        }
-    }
-}
-
 // Inform IDEs like IntelliJ IDEA, Eclipse or NetBeans about the generated code.
 sourceSets {
     main {
         java {
-            srcDirs 'build/generated/source/proto/main/grpc'
-            srcDirs 'build/generated/source/proto/main/java'
+            srcDirs '../grpc-proto/build/generated/source/proto/main/grpc'
+            srcDirs '../grpc-proto/build/generated/source/proto/main/java'
+        }
+        resources {
+            srcDirs '../grpc-proto'
         }
     }
 }
-
-// Generate IntelliJ IDEA's .idea & .iml project files
-apply plugin: 'idea'
-
-// Provide convenience executables for trying out the examples.
-apply plugin: 'application'
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
@@ -97,7 +73,7 @@ tasks.withType(JavaCompile) {
 
 jar {
     manifest {
-        attributes(
+        attributes (
                 "Manifest-Version": 1.0,
                 "Main-Class": "com.doopp.gauss.server.KTApplication",
                 "Class-Path": "./"
@@ -109,8 +85,10 @@ jar {
         }
     }
 }
-task clear(type:Delete){
-    delete 'build','target'
+
+task clear(type: Delete) {
+    delete 'build', 'target'
 }
-task release(type:Copy,dependsOn: [clear, jar]) {
+
+task release(type: Copy, dependsOn: [clear, jar]) {
 }
