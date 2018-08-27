@@ -26,7 +26,7 @@ public class SessionFilter {
     @Inject
     private RequestDispatcher requestProcessor;
 
-    public void doFilter(ChannelHandlerContext ctx, FullHttpRequest httpRequest, FullHttpResponse httpResponse) {
+    public boolean doFilter(ChannelHandlerContext ctx, FullHttpRequest httpRequest, FullHttpResponse httpResponse) {
 
         String uri = httpRequest.uri();
 

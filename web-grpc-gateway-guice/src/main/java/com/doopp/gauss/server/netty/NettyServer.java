@@ -58,12 +58,9 @@ public class NettyServer {
 		return new ChannelInitializer<SocketChannel>() {
 			@Override
 			protected void initChannel(SocketChannel ch) throws Exception {
-
 				ChannelPipeline pipeline = ch.pipeline();
-
 				// 设置30秒没有读到数据，则触发一个READER_IDLE事件。
 				// pipeline.addLast(new IdleStateHandler(30, 0, 0));
-
 				// 打印日志,可以看到websocket帧数据
 				// pipeline.addFirst(new LoggingHandler(LogLevel.INFO));
 				// HttpServerCodec：将请求和应答消息解码为HTTP消息
@@ -72,8 +69,8 @@ public class NettyServer {
 				pipeline.addLast(new HttpObjectAggregator(65536));
 				//
 				pipeline.addLast(new ChunkedWriteHandler());
-				// my application
-				pipeline.addLast(injector.getInstance(Http1RequestHandler.class));
+                // http
+                pipeline.addLast(injector.getInstance(Http1RequestHandler.class));
 			}
 		};
 	}
