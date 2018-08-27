@@ -32,10 +32,9 @@ public class SessionFilter {
 
         // 不过滤的uri
         String[] notFilters = new String[]{
-                "/api",
-                "/js",
-                "/css",
-                "/img",
+                "/login",
+                "/register",
+                "/logout",
         };
 
         // 是否过滤
@@ -63,7 +62,7 @@ public class SessionFilter {
                     // 如果能找到用户
                     if (user != null) {
                         ctx.channel().attr(AttributeKey.valueOf("currentUser")).set(user);
-                        requestProcessor.triggerAction(httpRequest, httpResponse);
+                        return true;
                     }
                     // 如果不能找到用户
                     else {
@@ -77,13 +76,14 @@ public class SessionFilter {
             }
             // 不用校验
             else {
-                requestProcessor.triggerAction(httpRequest, httpResponse);
+                return true;
             }
         }
         catch (Exception e) {
             e.printStackTrace();
             writeErrorResponse(HttpResponseStatus.BAD_GATEWAY, httpResponse, e.getMessage());
         }
+        return false;
     }
 
     private static void writeErrorResponse(HttpResponseStatus responseStatus, FullHttpResponse httpResponse, String message) {

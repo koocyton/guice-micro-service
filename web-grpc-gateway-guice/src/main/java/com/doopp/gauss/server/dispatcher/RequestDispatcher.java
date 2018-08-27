@@ -13,9 +13,7 @@ import java.net.URI;
 import java.util.*;
 
 import com.google.gson.Gson;
-import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.google.inject.Singleton;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -30,36 +28,65 @@ import org.slf4j.LoggerFactory;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 
-@Singleton
 public class RequestDispatcher {
 
     private final static Logger logger = LoggerFactory.getLogger(RequestDispatcher.class);
 
-    @Inject
     private Injector injector;
 
-    @Inject
-    private SessionFilter sessionFilter;
+    private SessionFilter filter;
 
-    public void processor(ChannelHandlerContext ctx, FullHttpRequest httpRequest, FullHttpResponse httpResponse) {
-        // filter
-        sessionFilter.doFilter(ctx, httpRequest, httpResponse);
+    private ChannelHandlerContext context;
+
+    private FullHttpRequest request;
+
+    private FullHttpResponse response;
+
+    public RequestDispatcher filter(SessionFilter filter) {
+        this.filter = filter;
+        return this;
     }
 
-    public void triggerAction(FullHttpRequest httpRequest, FullHttpResponse httpResponse) throws Exception {
+    public RequestDispatcher context(ChannelHandlerContext context) {
+        this.context = context;
+        return this;
+
+    }
+
+    public RequestDispatcher request(FullHttpRequest request) {
+        this.request = request;
+        return this;
+
+    }
+
+    public RequestDispatcher response(FullHttpResponse response) {
+        this.response = response;
+        return this;
+    }
+
+    public RequestDispatcher injector(Injector injector) {
+        this.injector = injector;
+        return this;
+    }
+
+    public void dispatcher() throws Exception {
+
+        if (!this.filter.doFilter(context, request, response)) {
+            return;
+        }
 
         // 取出 request uri 对应调用的 controller 和 method
-        URI uri = URI.create(httpRequest.uri());
+        URI uri = URI.create(request.uri());
         // uri path
         String dispatchUri = uri.getPath();
         // controller method index
-        String dispatchIndex = httpRequest.method().name() + " " + dispatchUri;
+        String dispatchIndex = request.method().name() + " " + dispatchUri;
         String dispatchValue = DispatchRule.rules.get(dispatchIndex);
         if (dispatchValue==null) {
             dispatchValue = DispatchRule.rules.get(dispatchUri);
         }
         if (dispatchValue==null) {
-            httpResponse.setStatus(HttpResponseStatus.NOT_FOUND);
+            response.setStatus(HttpResponseStatus.NOT_FOUND);
             return;
         }
 
@@ -72,7 +99,7 @@ public class RequestDispatcher {
             Class.forName(ctrlClass);
         }
         catch(ClassNotFoundException e) {
-            httpResponse.setStatus(HttpResponseStatus.NOT_FOUND);
+            response.setStatus(HttpResponseStatus.NOT_FOUND);
             return;
         }
 
@@ -87,7 +114,7 @@ public class RequestDispatcher {
         Object ctrlObject = injector.getInstance(Class.forName(ctrlClass));
 
         // POST GET 参数
-        Map<String, String> requestParams = this.getRequestParams(httpRequest);
+        Map<String, String> requestParams = this.getRequestParams(request);
         // 获取所有的方法
         Method[] methods = ctrlObject.getClass().getMethods();
         for(Method method : methods) {
@@ -99,15 +126,14 @@ public class RequestDispatcher {
                     //    objectList.add(modelMap);
                     //    classList.add(parameterClass);
                     // }
-                    // httpRequest
-                    // else
+                    // else if
                     if (parameterClass==FullHttpRequest.class) {
-                        objectList.add(httpRequest);
+                        objectList.add(request);
                         classList.add(parameterClass);
                     }
                     // httpResponse
                     else if (parameterClass==FullHttpResponse.class) {
-                        objectList.add(httpResponse);
+                        objectList.add(response);
                         classList.add(parameterClass);
                     }
                     // RequestParam
@@ -129,11 +155,11 @@ public class RequestDispatcher {
                     }
                     // RequestBody
                     else if (parameter.getAnnotation(RequestBody.class)!=null) {
-                        ByteBuf bf = httpRequest.content();
+                        ByteBuf bf = request.content();
                         byte[] byteArray = new byte[bf.capacity()];
                         bf.readBytes(byteArray);
-                        objectList.add((new Gson()).fromJson(new String(byteArray), parameterClass));
-                        classList.add(parameterClass);
+                        objectList.add((new Gson()).fromJson(new String(byteArray), parameterClass.getClass()));
+                        classList.add(parameterClass.getClass());
                     }
                     // null object
                     else {
@@ -158,7 +184,7 @@ public class RequestDispatcher {
             Gson gson = new Gson();
             try {
                 content = gson.toJson(method.invoke(ctrlObject, objects));
-                httpResponse.setStatus(HttpResponseStatus.OK);
+                response.setStatus(HttpResponseStatus.OK);
             }
             catch(InvocationTargetException e) {
                 if (e.getCause().getClass()==GaussException.class) {
@@ -168,13 +194,13 @@ public class RequestDispatcher {
                 else {
                     content = gson.toJson(new GaussException((short)500, "System Error"));
                 }
-                httpResponse.setStatus(HttpResponseStatus.BAD_GATEWAY);
+                response.setStatus(HttpResponseStatus.BAD_GATEWAY);
             }
-            httpResponse.headers().set(CONTENT_TYPE, "application/json; charset=UTF-8");
+            response.headers().set(CONTENT_TYPE, "application/json; charset=UTF-8");
         }
 
         // write response
-        httpResponse.content().writeBytes(Unpooled.copiedBuffer(content, CharsetUtil.UTF_8));
+        response.content().writeBytes(Unpooled.copiedBuffer(content, CharsetUtil.UTF_8));
     }
 
     // 处理 Get Post 请求

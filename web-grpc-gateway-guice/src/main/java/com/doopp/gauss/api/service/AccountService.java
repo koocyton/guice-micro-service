@@ -5,11 +5,11 @@ import com.doopp.gauss.common.exception.GaussException;
 
 public interface AccountService {
 
-    User userLogin(String account, String password) throws GaussException;
+    String userLogin(String account, String password);
 
-    User userRegister(String account, String password) throws GaussException;
+    String userRegister(String account, String password);
+
+    String userLogout(String token);
 
     User userByToken(String token) throws GaussException;
-
-    String setSession(User user);
 }

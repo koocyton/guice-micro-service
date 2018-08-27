@@ -5,6 +5,7 @@ import com.doopp.gauss.api.service.impl.AccountServiceImpl;
 import com.doopp.gauss.common.util.IdWorker;
 import com.doopp.gauss.server.application.ApplicationProperties;
 import com.google.inject.*;
+import com.google.inject.name.Names;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 
@@ -12,20 +13,21 @@ public class ApplicationModule extends AbstractModule {
 
 	@Override
 	public void configure() {
-		bind(AccountService.class).to(AccountServiceImpl.class).in(Scopes.SINGLETON);
+		bind(AccountService.class).to(AccountServiceImpl.class).in(Singleton.class);
+		bind(ApplicationProperties.class).in(Singleton.class);
 	}
 
-	@Singleton
-	@Provides
-	public IdWorker userIdWorker() {
-		return new IdWorker(1, 1);
-	}
+	// @Singleton
+	// @Provides
+	// public IdWorker userIdWorker() {
+	//	return new IdWorker(1, 1);
+	// }
 
-	@Singleton
-	@Provides
-	public ApplicationProperties applicationProperties() {
-		return new ApplicationProperties();
-	}
+	//@Singleton
+	//@Provides
+	//public ApplicationProperties applicationProperties() {
+	//	return new ApplicationProperties();
+	//}
 
 	@Provides
 	public EventLoopGroup eventLoopGroup() {

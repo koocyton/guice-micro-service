@@ -8,39 +8,19 @@ import com.google.inject.Inject;
 
 public class AccountServiceImpl implements AccountService {
 
-
-    @Inject
-    private IdWorker userIdWorker;
-
-    /**
-     * 通过账号，密码获取用户信息
-     *
-     * @param account 用户账号
-     * @param password 用户密码
-     * @return 用户信息
-     * @throws Exception 登录异常
-     */
     @Override
-    public User userLogin(String account, String password) throws GaussException {
-        return new User();
-    }
-
-    /**
-     * 通过账号，密码获取用户信息
-     *
-     * @param account 用户账号
-     * @param password 用户密码
-     * @return 用户信息
-     * @throws Exception 登录异常
-     */
-    @Override
-    public User userRegister(String account, String password) throws GaussException {
-        return new User();
+    public String userLogin(String account, String password) {
+        return "userLogin";
     }
 
     @Override
-    public String setSession(User user) {
-        return "test";
+    public String userRegister(String account, String password) {
+        return "userRegister";
+    }
+
+    @Override
+    public String userLogout(String token) {
+        return "userLogout";
     }
 
     @Override

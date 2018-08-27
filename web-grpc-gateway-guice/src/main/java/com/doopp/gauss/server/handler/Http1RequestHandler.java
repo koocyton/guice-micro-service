@@ -25,13 +25,16 @@ public class Http1RequestHandler extends SimpleChannelInboundHandler<FullHttpReq
         FullHttpResponse httpResponse = new DefaultFullHttpResponse(httpRequest.protocolVersion(), HttpResponseStatus.OK);
         // httpResponse.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/html; charset=UTF-8");
 
-        // Filter
-        SessionFilter sessionFilter = injector.getInstance(SessionFilter.class);
+        // RequestDispatcher
 
-        // Dispatch
-        if (sessionFilter.doFilter()) {
-            injector.getInstance(RequestDispatcher.class).processor(ctx, httpRequest, httpResponse);
-        }
+        (new RequestDispatcher())
+            // set filter
+            .filter(new SessionFilter())
+            .context(ctx)
+            .request(httpRequest)
+            .response(httpResponse)
+            .injector(injector)
+            .dispatcher();
 
         httpResponse.headers().set(CONTENT_LENGTH, httpResponse.content().readableBytes());
 
