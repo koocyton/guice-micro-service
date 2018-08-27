@@ -67,6 +67,7 @@ public class NettyServer {
 				pipeline.addLast(new HttpServerCodec());
 				// HttpObjectAggregator：将HTTP消息的多个部分合成一条完整的HTTP消息
 				pipeline.addLast(new HttpObjectAggregator(65536));
+				//
 				pipeline.addLast(new ChunkedWriteHandler());
                 // http
                 pipeline.addLast(injector.getInstance(Http1RequestHandler.class));

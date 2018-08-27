@@ -12,6 +12,9 @@ import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
 public class Http1RequestHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     @Inject
+    private RequestDispatcher requestDispatcher;
+
+    @Inject
     private Injector injector;
 
     @Override
@@ -25,6 +28,7 @@ public class Http1RequestHandler extends SimpleChannelInboundHandler<FullHttpReq
         FullHttpResponse httpResponse = new DefaultFullHttpResponse(httpRequest.protocolVersion(), HttpResponseStatus.OK);
         // httpResponse.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/html; charset=UTF-8");
 
+<<<<<<< HEAD
         // RequestDispatcher
 
         (new RequestDispatcher())
@@ -35,6 +39,16 @@ public class Http1RequestHandler extends SimpleChannelInboundHandler<FullHttpReq
             .response(httpResponse)
             .injector(injector)
             .dispatcher();
+=======
+        requestDispatcher.processor(ctx, httpRequest, httpResponse);
+        // Filter
+        SessionFilter sessionFilter = injector.getInstance(SessionFilter.class);
+
+        // Dispatch
+        if (sessionFilter.doFilter()) {
+            injector.getInstance(RequestDispatcher.class).processor(ctx, httpRequest, httpResponse);
+        }
+>>>>>>> 1de8f7181667766ed4e030d20cce9e9c0e7f3afe
 
         httpResponse.headers().set(CONTENT_LENGTH, httpResponse.content().readableBytes());
 
