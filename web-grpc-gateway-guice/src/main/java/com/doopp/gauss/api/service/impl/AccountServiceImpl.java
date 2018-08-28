@@ -33,8 +33,11 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public User userByToken(String token) {
-        LoginReply reply = userGrpcClient.login("koocyton", "password");
-        logger.info("" + reply);
         return new User();
+    }
+
+    @Override
+    public LoginReply testGrpc() {
+        return userGrpcClient.login("koocyton", "password");
     }
 }

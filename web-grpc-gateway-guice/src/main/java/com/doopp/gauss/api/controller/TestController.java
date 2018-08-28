@@ -5,6 +5,7 @@ import com.doopp.gauss.common.entity.User;
 import com.doopp.gauss.server.annotation.*;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.grpc.gauss.user.LoginReply;
 
 @Singleton
 public class TestController {
@@ -28,7 +29,7 @@ public class TestController {
     }
 
     @ResponseBody
-    public void testGrpcClient() {
-        accountService.userByToken("abcdef");
+    public LoginReply testGrpcClient() {
+        return accountService.testGrpc();
     }
 }

@@ -36,6 +36,7 @@ public class SessionFilter {
             "/logout",
             "/test/testCookie",
             "/test/testHeader",
+            "/test/testGrpcClient",
         };
 
         // 是否过滤

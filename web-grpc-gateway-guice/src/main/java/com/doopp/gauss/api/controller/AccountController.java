@@ -31,8 +31,7 @@ public class AccountController {
     }
 
     @ResponseBody
-    public User userLogout(@RequestSession("currentUser") User currentUser) {
-        return currentUser;
-        // accountService.userLogout(token);
+    public String userLogout(@RequestSession("currentUser") User currentUser) {
+        return accountService.userLogout("abc");
     }
 }
