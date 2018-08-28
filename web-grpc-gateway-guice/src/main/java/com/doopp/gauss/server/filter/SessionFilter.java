@@ -25,18 +25,17 @@ public class SessionFilter {
     @Inject
     private AccountService accountService;
 
-    @Inject
-    private RequestDispatcher requestProcessor;
-
     public boolean doFilter(ChannelHandlerContext ctx, FullHttpRequest httpRequest, FullHttpResponse httpResponse) {
 
         String uri = URI.create(httpRequest.uri()).getPath();
 
         // 不过滤的uri
         String[] notFilters = new String[]{
-                "/login",
-                "/register",
-                "/logout",
+            "/login",
+            "/register",
+            "/logout",
+            "/test/testCookie",
+            "/test/testHeader",
         };
 
         // 是否过滤
@@ -44,20 +43,19 @@ public class SessionFilter {
 
         // 如果uri中包含不过滤的uri，则不进行过滤
         for (String notFilter : notFilters) {
-            if (uri.equals(notFilter)) {
+            if (uri.contains(notFilter)) {
                 doFilter = false;
                 break;
             }
         }
 
-        logger.info((doFilter) ? "doFilter " : "notDoFilter " + uri +"");
+        logger.info((doFilter) ? "{} [filter]" : "{} [unFilter]", uri);
 
         // 执行过滤 验证通过的会话
         try {
             if (doFilter) {
                 // 从 header 里拿到 access token
                 String sessionToken = httpRequest.headers().get("session-token");
-
                 // 如果 token 存在，反解 token
                 if (sessionToken != null) {
                     User user = accountService.userByToken(sessionToken);

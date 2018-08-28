@@ -18,6 +18,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
+import io.netty.handler.codec.http.cookie.Cookie;
+import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import io.netty.handler.codec.http.multipart.DefaultHttpDataFactory;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
@@ -116,6 +118,12 @@ public class RequestDispatcher {
 
         // POST GET 参数
         Map<String, String> requestParams = this.getRequestParams(request);
+        // Headers
+        HttpHeaders httpHeaders = request.headers();
+        // Cookies
+        Set<Cookie> httpCookies = httpHeaders.get("Cookie")==null
+            ? null
+            : ServerCookieDecoder.STRICT.decode(httpHeaders.get("Cookie"));
         // 获取所有的方法
         Method[] methods = ctrlObject.getClass().getMethods();
         for(Method method : methods) {
@@ -158,21 +166,32 @@ public class RequestDispatcher {
                             classList.add(String.class);
                         }
                     }
-                    // RequestBody
-                    else if (parameter.getAnnotation(RequestCookie.class)!=null) {
+                    // RequestHeader
+                    else if (parameter.getAnnotation(RequestHeader.class)!=null) {
+                        String requestParamKey = parameter.getAnnotation(RequestHeader.class).value();
+                        objectList.add(httpHeaders.get(requestParamKey));
+                        classList.add(String.class);
                     }
-                    // RequestBody
+                    // RequestCookie
+                    else if (parameter.getAnnotation(RequestCookie.class)!=null) {
+                        String requestParamKey = parameter.getAnnotation(RequestCookie.class).value();
+                        String requestParamVal = null;
+                        for (Cookie cookie : httpCookies) {
+                            if (cookie.name().equals(requestParamKey)) {
+                                requestParamVal = cookie.value();
+                            }
+                        }
+                        objectList.add(requestParamVal);
+                        classList.add(parameterClass);
+                    }
+                    // RequestSession
                     else if (parameter.getAnnotation(RequestSession.class)!=null) {
-                        logger.info("" + parameter.getAnnotation(RequestParam.class));
-                        logger.info("" + parameter);
-                        String requestParamKey = parameter.getAnnotation(RequestParam.class).value();
-                        String requestParamVal = requestParams.get(requestParamKey);
-                        objectList.add(context.channel().attr(AttributeKey.valueOf(requestParamVal)).get());
+                        String requestParamKey = parameter.getAnnotation(RequestSession.class).value();
+                        objectList.add(context.channel().attr(AttributeKey.valueOf(requestParamKey)).get());
                         classList.add(parameterClass);
                     }
                     // RequestBody
                     else if (parameter.getAnnotation(RequestBody.class)!=null) {
-                        logger.info(RequestBody.class + " " + parameterClass + " " + parameter.getAnnotation(RequestBody.class));
                         ByteBuf bf = request.content();
                         byte[] byteArray = new byte[bf.capacity()];
                         bf.readBytes(byteArray);

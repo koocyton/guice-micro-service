@@ -2,13 +2,15 @@ package com.doopp.gauss.api.service.impl;
 
 import com.doopp.gauss.api.service.AccountService;
 import com.doopp.gauss.common.entity.User;
-import com.doopp.gauss.common.exception.GaussException;
 import com.doopp.gauss.common.grpc.UserGrpcClient;
-import com.doopp.gauss.common.util.IdWorker;
 import com.google.inject.Inject;
 import io.grpc.gauss.user.LoginReply;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AccountServiceImpl implements AccountService {
+
+    private static Logger logger = LoggerFactory.getLogger(AccountServiceImpl.class);
 
     @Inject
     private UserGrpcClient userGrpcClient;
@@ -30,7 +32,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public User userByToken(String token) throws GaussException {
+    public User userByToken(String token) {
+        LoginReply reply = userGrpcClient.login("koocyton", "password");
+        logger.info("" + reply);
         return new User();
     }
 }

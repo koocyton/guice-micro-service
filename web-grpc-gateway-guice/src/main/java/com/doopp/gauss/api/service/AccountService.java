@@ -11,5 +11,5 @@ public interface AccountService {
 
     String userLogout(String token);
 
-    User userByToken(String token) throws GaussException;
+    User userByToken(String token);
 }

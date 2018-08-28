@@ -29,9 +29,8 @@ public class Http1RequestHandler extends SimpleChannelInboundHandler<FullHttpReq
         // httpResponse.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/html; charset=UTF-8");
 
         // RequestDispatcher
-        (new RequestDispatcher())
-            // set filter
-            .filter(new SessionFilter())
+        injector.getInstance(RequestDispatcher.class)
+            .filter(injector.getInstance(SessionFilter.class))
             .context(ctx)
             .request(httpRequest)
             .response(httpResponse)
