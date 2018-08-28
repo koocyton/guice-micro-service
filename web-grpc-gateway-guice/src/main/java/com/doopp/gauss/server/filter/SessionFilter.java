@@ -14,6 +14,8 @@ import io.netty.util.CharsetUtil;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
+import java.net.URI;
+
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 
 public class SessionFilter {
@@ -28,7 +30,7 @@ public class SessionFilter {
 
     public boolean doFilter(ChannelHandlerContext ctx, FullHttpRequest httpRequest, FullHttpResponse httpResponse) {
 
-        String uri = httpRequest.uri();
+        String uri = URI.create(httpRequest.uri()).getPath();
 
         // 不过滤的uri
         String[] notFilters = new String[]{
@@ -42,7 +44,7 @@ public class SessionFilter {
 
         // 如果uri中包含不过滤的uri，则不进行过滤
         for (String notFilter : notFilters) {
-            if (uri.contains(notFilter)) {
+            if (uri.equals(notFilter)) {
                 doFilter = false;
                 break;
             }

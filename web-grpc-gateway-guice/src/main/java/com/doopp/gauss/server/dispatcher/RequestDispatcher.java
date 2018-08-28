@@ -1,9 +1,8 @@
 package com.doopp.gauss.server.dispatcher;
 
+import com.doopp.gauss.common.entity.User;
 import com.doopp.gauss.common.exception.GaussException;
-import com.doopp.gauss.server.annotation.RequestBody;
-import com.doopp.gauss.server.annotation.RequestParam;
-import com.doopp.gauss.server.annotation.ResponseBody;
+import com.doopp.gauss.server.annotation.*;
 import com.doopp.gauss.server.filter.SessionFilter;
 
 import java.lang.reflect.InvocationTargetException;
@@ -13,6 +12,7 @@ import java.net.URI;
 import java.util.*;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.inject.Injector;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -22,6 +22,7 @@ import io.netty.handler.codec.http.multipart.DefaultHttpDataFactory;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
 import io.netty.handler.codec.http.multipart.MemoryAttribute;
+import io.netty.util.AttributeKey;
 import io.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,18 +149,35 @@ public class RequestDispatcher {
                             objectList.add(Integer.valueOf(requestParamVal));
                             classList.add(Integer.class);
                         }
+                        else if (parameterClass==Boolean.class) {
+                            objectList.add(Boolean.valueOf(requestParamVal));
+                            classList.add(Boolean.class);
+                        }
                         else {
                             objectList.add(String.valueOf(requestParamVal));
                             classList.add(String.class);
                         }
                     }
                     // RequestBody
+                    else if (parameter.getAnnotation(RequestCookie.class)!=null) {
+                    }
+                    // RequestBody
+                    else if (parameter.getAnnotation(RequestSession.class)!=null) {
+                        logger.info("" + parameter.getAnnotation(RequestParam.class));
+                        logger.info("" + parameter);
+                        String requestParamKey = parameter.getAnnotation(RequestParam.class).value();
+                        String requestParamVal = requestParams.get(requestParamKey);
+                        objectList.add(context.channel().attr(AttributeKey.valueOf(requestParamVal)).get());
+                        classList.add(parameterClass);
+                    }
+                    // RequestBody
                     else if (parameter.getAnnotation(RequestBody.class)!=null) {
+                        logger.info(RequestBody.class + " " + parameterClass + " " + parameter.getAnnotation(RequestBody.class));
                         ByteBuf bf = request.content();
                         byte[] byteArray = new byte[bf.capacity()];
                         bf.readBytes(byteArray);
-                        objectList.add((new Gson()).fromJson(new String(byteArray), parameterClass.getClass()));
-                        classList.add(parameterClass.getClass());
+                        objectList.add((new Gson()).fromJson(new String(byteArray), parameterClass));
+                        classList.add(parameterClass);
                     }
                     // null object
                     else {
@@ -181,7 +199,8 @@ public class RequestDispatcher {
 
         // if json
         if (method.isAnnotationPresent(ResponseBody.class)) {
-            Gson gson = new Gson();
+            // new Gson();
+            Gson gson = new GsonBuilder().serializeNulls().create();
             try {
                 content = gson.toJson(method.invoke(ctrlObject, objects));
                 response.setStatus(HttpResponseStatus.OK);
