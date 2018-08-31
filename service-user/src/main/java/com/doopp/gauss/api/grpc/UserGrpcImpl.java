@@ -14,7 +14,7 @@ public class UserGrpcImpl extends UserGrpc.UserImplBase {
 
     @Override
     public void login(LoginRequest request, StreamObserver<LoginReply> responseObserver) {
-        LoginReply reply = LoginReply.newBuilder().setToken("abc").build();
+        LoginReply reply = LoginReply.newBuilder().setToken("linghou 119").build();
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }

@@ -12,9 +12,6 @@ import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
 public class Http1RequestHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     @Inject
-    private RequestDispatcher requestDispatcher;
-
-    @Inject
     private Injector injector;
 
     @Override
